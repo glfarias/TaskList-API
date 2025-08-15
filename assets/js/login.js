@@ -25,31 +25,25 @@ class User {
 function newUser() {
     axios.get(`https://689688bc250b078c203facac.mockapi.io/api/users?name=${loginInput.value}`)
     .then((response) => {
+
         if (response.data.length > 0) {
             const errorText = document.querySelector(".error-text");
             errorText.innerHTML = ('User already exists, try logging in')
-        } else {
-            const user = loginInput.value;
-            const pin = pinInput.value;
-            const tasksList = [];
-            const newUser = new User(user, pin, tasksList);
-            axios.post("https://689688bc250b078c203facac.mockapi.io/api/users/", newUser)
-            .then(response => {
+        }
+    })
+    .catch(() => {
+                const user = loginInput.value;
+                const pin = pinInput.value;
+                const tasksList = [];
+                const newUser = new User(user, pin, tasksList);
+                axios.post("https://689688bc250b078c203facac.mockapi.io/api/users/", newUser)
+                .then(response => {
                 const newUserCreated = response.data;
                 localStorage.setItem("tasksList", JSON.stringify(newUserCreated.tasks));
                 localStorage.setItem("user", JSON.stringify(newUserCreated.name));
                 localStorage.setItem("userId", JSON.stringify(newUserCreated.id));
                 window.location.replace('tasks.html');
             })
-            .catch(() => {
-                const errorText = document.querySelector(".error-text");
-                errorText.innerHTML = ('Unexpected error, try again later')
-            })
-        }
-    })
-    .catch(() => {
-                const errorText = document.querySelector(".error-text");
-                errorText.innerHTML = ('Unexpected error, try again later')
             })
 }
 
@@ -119,17 +113,18 @@ function login() {
                 checkInputs();
                 pinInput.focus()
             }
-        } else {
-            checkSignUp();
-            loginInput.focus();
-            const errorText = document.querySelector(".error-text");
-            errorText.innerHTML = 'User not found, maybe click sign-up?';
         }
     });
 
     promise.catch(error => {
         const errorText = document.querySelector(".error-text");
-        errorText.innerHTML = 'Unexpected error, try again later';
+        if (error.response.status == 404) {
+            checkSignUp();
+            loginInput.focus();
+            errorText.innerHTML = 'User not found, maybe click sign-up?';
+        } else {
+            errorText.innerHTML = 'Unexpected error, try again later';   
+        }
     })
 
 }
