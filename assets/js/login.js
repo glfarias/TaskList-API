@@ -26,25 +26,38 @@ function newUser() {
     axios.get(`https://689688bc250b078c203facac.mockapi.io/api/users?name=${loginInput.value}`)
     .then((response) => {
 
+        if (!loginInput.value.trim() || !pinInput.value.trim()) {
+            errorText.innerHTML = 'Login and PIN required';
+            return;
+        }
+
         if (response.data.length > 0) {
             const errorText = document.querySelector(".error-text");
             errorText.innerHTML = ('User already exists, try logging in')
-        }
-    })
-    .catch(() => {
-                const user = loginInput.value;
-                const pin = pinInput.value;
-                const tasksList = [];
-                const newUser = new User(user, pin, tasksList);
-                axios.post("https://689688bc250b078c203facac.mockapi.io/api/users/", newUser)
-                .then(response => {
+        } else {
+            const user = loginInput.value.trim();
+            const pin = pinInput.value.trim();
+            const tasksList = [];
+            const newUser = new User(user, pin, tasksList);
+            axios.post("https://689688bc250b078c203facac.mockapi.io/api/users/", newUser)
+            .then(response => {
                 const newUserCreated = response.data;
                 localStorage.setItem("tasksList", JSON.stringify(newUserCreated.tasks));
                 localStorage.setItem("user", JSON.stringify(newUserCreated.name));
                 localStorage.setItem("userId", JSON.stringify(newUserCreated.id));
                 window.location.replace('tasks.html');
             })
+            .catch(error => {
+                const errorText = document.querySelector(".error-text");
+                errorText.innerHTML = ('Error creating user, try again later')
             })
+        }
+    })
+    .catch((error) => {
+        console.log(error)
+        const errorText = document.querySelector(".error-text");
+        errorText.innerHTML = ('Error, try again later')
+    })
 }
 
 eyeIcons.forEach(icon => {
@@ -90,11 +103,21 @@ function checkInputs() {
 }
 
 function login() {
-    const promise = axios.get("https://689688bc250b078c203facac.mockapi.io/api/users?name=" + loginInput.value);
-    promise.then(response => {
+    const errorText = document.querySelector(".error-text");
 
-        if (response.data.length > 0) {
-            if (response.data[0].name === loginInput.value && response.data[0].pin === pinInput.value) {
+    if (!loginInput.value.trim() || !pinInput.value.trim()) {
+        errorText.innerHTML = 'Login and PIN required';
+        return;
+    }
+
+    axios.get("https://689688bc250b078c203facac.mockapi.io/api/users?name=" + loginInput.value)
+    .then(response => {
+        if (response.data.length == 0) {
+            checkSignUp();
+            loginInput.focus();
+            errorText.innerHTML = 'User not found, maybe click sign-up?';
+        } else {
+            if (response.data[0].name === loginInput.value.trim() && response.data[0].pin === pinInput.value.trim()) {
                 const tasksList = response.data[0].tasks;
                 const user = response.data[0].name;
                 const userId = response.data[0].id;
@@ -105,28 +128,17 @@ function login() {
                 setTimeout(() => {
                     window.location.replace('tasks.html');
                 }, 250);
-    
             } else {
-                const errorText = document.querySelector(".error-text");
                 errorText.innerHTML = 'Invalid PIN, try again';
                 pinInput.value = '';
                 checkInputs();
                 pinInput.focus()
             }
         }
-    });
-
-    promise.catch(error => {
-        const errorText = document.querySelector(".error-text");
-        if (error.response.status == 404) {
-            checkSignUp();
-            loginInput.focus();
-            errorText.innerHTML = 'User not found, maybe click sign-up?';
-        } else {
-            errorText.innerHTML = 'Unexpected error, try again later';   
-        }
     })
-
+    .catch(error => {
+        errorText.innerHTML = 'Error, try again later';
+    })
 }
 
 function checkSignUp() {
