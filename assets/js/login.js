@@ -8,6 +8,7 @@ const pinInput = document.getElementById("pin-input");
 const pinHide = document.getElementById("pin-hide");
 const loginBtn = document.getElementById("login-button");
 const signUpBtn = document.getElementById('signup-button');
+const errorText = document.getElementById('error-text');
 
 loginBtn.addEventListener('click', login);
 
@@ -23,23 +24,22 @@ class User {
 }
 
 function newUser() {
-    axios.get(`https://689688bc250b078c203facac.mockapi.io/api/users?name=${loginInput.value}`)
+
+    if (!loginInput.value.trim() || !pinInput.value.trim()) {
+        errorText.innerHTML = 'Login and PIN required';
+        return;
+    }
+
+    axios.get(`https://689688bc250b078c203facac.mockapi.io/api/users?name=${encodeURIComponent(loginInput.value.trim())}`)
     .then((response) => {
-
-        if (!loginInput.value.trim() || !pinInput.value.trim()) {
-            errorText.innerHTML = 'Login and PIN required';
-            return;
-        }
-
         if (response.data.length > 0) {
-            const errorText = document.querySelector(".error-text");
             errorText.innerHTML = ('User already exists, try logging in')
         } else {
             const user = loginInput.value.trim();
             const pin = pinInput.value.trim();
             const tasksList = [];
-            const newUser = new User(user, pin, tasksList);
-            axios.post("https://689688bc250b078c203facac.mockapi.io/api/users/", newUser)
+            const newUserObject = new User(user, pin, tasksList);
+            axios.post("https://689688bc250b078c203facac.mockapi.io/api/users/", newUserObject)
             .then(response => {
                 const newUserCreated = response.data;
                 localStorage.setItem("tasksList", JSON.stringify(newUserCreated.tasks));
@@ -48,15 +48,14 @@ function newUser() {
                 window.location.replace('tasks.html');
             })
             .catch(error => {
-                const errorText = document.querySelector(".error-text");
-                errorText.innerHTML = ('Error creating user, try again later')
+                errorText.innerHTML = ('Error creating user, try again later');
+                console.log(error);
             })
         }
     })
     .catch((error) => {
-        console.log(error)
-        const errorText = document.querySelector(".error-text");
-        errorText.innerHTML = ('Error, try again later')
+        errorText.innerHTML = ('Unexpected error, try again later');
+        console.log(error);
     })
 }
 
@@ -103,19 +102,15 @@ function checkInputs() {
 }
 
 function login() {
-    const errorText = document.querySelector(".error-text");
-
     if (!loginInput.value.trim() || !pinInput.value.trim()) {
         errorText.innerHTML = 'Login and PIN required';
         return;
     }
 
-    axios.get("https://689688bc250b078c203facac.mockapi.io/api/users?name=" + loginInput.value)
+    axios.get(`https://689688bc250b078c203facac.mockapi.io/api/users?name=${encodeURIComponent(loginInput.value.trim())}`)
     .then(response => {
         if (response.data.length == 0) {
-            checkSignUp();
-            loginInput.focus();
-            errorText.innerHTML = 'User not found, maybe click sign-up?';
+            handleUserNotFound();
         } else {
             if (response.data[0].name === loginInput.value.trim() && response.data[0].pin === pinInput.value.trim()) {
                 const tasksList = response.data[0].tasks;
@@ -137,7 +132,12 @@ function login() {
         }
     })
     .catch(error => {
-        errorText.innerHTML = 'Error, try again later';
+        if (error.response && error.response.status === 404) {
+            handleUserNotFound();
+        } else {
+            errorText.innerHTML = 'Unexpected error, try again later';
+            console.log(error)
+        }
     })
 }
 
@@ -150,4 +150,10 @@ function checkSignUp() {
 function clearInputs() {
     loginInput.value = '';
     pinInput.value = '';
+}
+
+function handleUserNotFound() {
+    checkSignUp();
+    loginInput.focus();
+    errorText.innerHTML = 'User not found, maybe click sign-up?';
 }
