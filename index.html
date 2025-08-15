@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="assets/css/reset.css">
+    <link rel="stylesheet" href="assets/css/login.css">
+    <link rel="stylesheet" href="assets/css/mediaqueries.css">
+    <title>Task List - API</title>
+</head>
+<body>
+    <main>
+        <div class="text">
+            <p class="title">Ready to tackle your tasks?</p>
+            <p class="subtitle">Log in to see your to-do list.</p>
+        </div>
+
+        
+        <form action="" method="post">
+            <div class="login">
+                <label for="login-input">
+                    <ion-icon id="login-icon" name="person-outline"></ion-icon>
+                </label>
+                <input type="text" id="login-input" placeholder="Your Name" autocomplete="name" required>
+            </div>
+            <div class="pin">
+                <label for="pin-input">
+                    <ion-icon id="pin-icon" name="key-outline"></ion-icon>
+                </label>
+                <input type="password" id="pin-input" placeholder="Type your pin" autocomplete="current-password" required>
+                <ion-icon id="pin-show" name="eye-outline" class="hidden"></ion-icon>
+                <ion-icon id="pin-hide" name="eye-off-outline"></ion-icon>
+            </div>
+            <p class="error-text"></p>
+        </form>
+        
+
+        <div class="buttons">
+            <button type="button" id="login-button" disabled>LOGIN</button>
+            <button type="button" id="signup-button">SIGN-UP</button>
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="assets/js/login.js"></script>
+</body>
+</html>

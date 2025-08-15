@@ -1,0 +1,88 @@
+@charset "UTF-8";
+
+/* BETTER MOBILES (iPhone 11+)  */
+@media screen and (min-width: 390px) {
+    body {
+        background-image: url('../../assets/images/login.jpg');
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: 65% 0%;
+    }
+
+    main {
+        width: 350px;
+        height: 300px;
+    }
+
+    form {
+        width: 350px;
+    }
+}
+
+/* TABLETS (PORTRAIT) */
+@media screen and (min-width: 768px) {
+    body {
+        background-image: url('../../assets/images/login.jpg');
+        background-size: cover;
+        background-position: 50% 50%;
+        background-attachment: fixed;
+    }
+
+    main {
+        width: 375px;
+        height: 325px;
+    }
+
+    form {
+        width: 350px;
+    }
+
+    .title {
+        font-size: 1.8em;
+    }
+
+    .subtitle {
+        font-size: 1.5em;
+    }
+}
+
+/* TABLETS (LANDSCAPE) & SMALL LAPTOPS */
+
+@media screen and (min-width: 1024px) {
+    main {
+        width: 400px;
+        height: 350px;
+    }
+
+    form {
+        width: 375px;
+    }
+
+    .title {
+        font-size: 2em;
+    }
+
+    .subtitle {
+        font-size: 1.7em;
+    }
+}
+
+/* DEFAULT DESKTOPS (FHD MONITORS) */
+@media screen and (min-width: 1200px) {
+    main {
+        width: 425px;
+        height: 375px;
+    }
+
+    form {
+        width: 400px;
+    }
+
+    .title {
+        font-size: 2.1em;
+    }
+
+    .subtitle {
+        font-size: 1.9em;
+    }
+}
