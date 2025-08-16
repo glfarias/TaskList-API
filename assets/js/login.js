@@ -29,7 +29,7 @@ function newUser() {
         errorText.innerHTML = 'Login and PIN required';
         return;
     }
-
+    console.log(`https://689688bc250b078c203facac.mockapi.io/api/users?name=${encodeURIComponent(loginInput.value.trim())}`);
     axios.get(`https://689688bc250b078c203facac.mockapi.io/api/users?name=${encodeURIComponent(loginInput.value.trim())}`)
     .then((response) => {
         if (response.data.length > 0) {
@@ -39,22 +39,35 @@ function newUser() {
             const pin = pinInput.value.trim();
             const tasksList = [];
             const newUserObject = new User(user, pin, tasksList);
-            axios.post("https://689688bc250b078c203facac.mockapi.io/api/users/", newUserObject)
-            .then(response => {
-                const newUserCreated = response.data;
-                localStorage.setItem("tasksList", JSON.stringify(newUserCreated.tasks));
-                localStorage.setItem("user", JSON.stringify(newUserCreated.name));
-                localStorage.setItem("userId", JSON.stringify(newUserCreated.id));
-                window.location.replace('tasks.html');
-            })
-            .catch(error => {
-                errorText.innerHTML = ('Error creating user, try again later');
-                console.log(error);
-            })
+            createNewUser(newUserObject)
         }
     })
     .catch((error) => {
-        errorText.innerHTML = ('Unexpected error, try again later');
+
+        if (error.status === 404) {
+            const user = loginInput.value.trim();
+            const pin = pinInput.value.trim();
+            const tasksList = [];
+            const newUserObject = new User(user, pin, tasksList);
+            createNewUser(newUserObject)
+        } else {
+            errorText.innerHTML = ('Unexpected error, try again later');
+            console.log(error)
+        }
+    })
+}
+
+function createNewUser(newUserObject) {
+    axios.post("https://689688bc250b078c203facac.mockapi.io/api/users", newUserObject)
+    .then(response => {
+        const newUserCreated = response.data;
+        localStorage.setItem("tasksList", JSON.stringify(newUserCreated.tasks));
+        localStorage.setItem("user", JSON.stringify(newUserCreated.name));
+        localStorage.setItem("userId", JSON.stringify(newUserCreated.id));
+        window.location.replace('tasks.html');
+    })
+    .catch(error => {
+        errorText.innerHTML = ('Error creating user, try again later');
         console.log(error);
     })
 }

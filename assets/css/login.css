@@ -141,7 +141,7 @@ form {
 }
 
 
-.error-text {
+#error-text {
     text-align: center;
     color: red;
 }
